@@ -9,38 +9,30 @@ let addressData = {
     districts: [],
     subDistricts: []
 };
-let nameData = {
-    firstNames: [],
-    lastNames: []
-};
 let isDataLoaded = false;
 
 // --- Data Loading ---
-async function loadAllData() {
+async function loadAddressData() {
     try {
-        const [provincesRes, districtsRes, subDistrictsRes, firstNamesRes, lastNamesRes] = await Promise.all([
+        const [provincesRes, districtsRes, subDistrictsRes] = await Promise.all([
             fetch('src/province.json'),
             fetch('src/district.json'),
-            fetch('src/sub_district.json'),
-            fetch('src/first_names.json'),
-            fetch('src/last_names.json')
+            fetch('src/sub_district.json')
         ]);
 
         addressData.provinces = await provincesRes.json();
         addressData.districts = await districtsRes.json();
         addressData.subDistricts = await subDistrictsRes.json();
-        nameData.firstNames = await firstNamesRes.json();
-        nameData.lastNames = await lastNamesRes.json();
 
         isDataLoaded = true;
-        console.log("All data loaded successfully.");
+        console.log("Address data loaded successfully.");
         // Initial display after data is loaded
         displayRandomData();
     } catch (error) {
-        console.error("Failed to load data:", error);
+        console.error("Failed to load address data:", error);
         // Display an error message on the page
         const displayElement = document.getElementById('display-data');
-        displayElement.innerHTML = `<div class="col-12"><div class="alert alert-danger">ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบไฟล์ JSON และลองอีกครั้ง</div></div>`;
+        displayElement.innerHTML = `<div class="col-12"><div class="alert alert-danger">ไม่สามารถโหลดข้อมูลที่อยู่ได้ กรุณาตรวจสอบไฟล์ JSON และลองอีกครั้ง</div></div>`;
     }
 }
 
@@ -59,10 +51,39 @@ function createThaiId() {
 }
 
 function createCreditCard() {
-    if (!isDataLoaded || nameData.firstNames.length === 0 || nameData.lastNames.length === 0) return null;
+    // Data sets for random names (Thai/English)
+    const firstNames = [
+        { en: 'Somchai', th: 'สมชาย' }, { en: 'Somsri', th: 'สมศรี' },
+        { en: 'Manee', th: 'มณี' }, { en: 'Piti', th: 'ปิติ' },
+        { en: 'Chujai', th: 'ชูใจ' }, { en: 'Nadech', th: 'ณเดชน์' },
+        { en: 'Yaya', th: 'ญาญ่า' }, { en: 'Mario', th: 'มาริโอ้' },
+        { en: 'Anan', th: 'อนันต์' }, { en: 'Kanya', th: 'กัญญา' },
+        { en: 'Thanawat', th: 'ธนวัฒน์' }, { en: 'Supaporn', th: 'สุภาพร' },
+        { en: 'Wichai', th: 'วิชัย' }, { en: 'Araya', th: 'อารยา' },
+        { en: 'Krit', th: 'กฤต' }, { en: 'Nalinee', th: 'นลินี' },
+        { en: 'Phatchara', th: 'พัชรา' }, { en: 'Sakda', th: 'ศักดา' },
+        { en: 'Chanida', th: 'ชนิดา' }, { en: 'Teerapat', th: 'ธีรภัทร' },
+        { en: 'Nattapong', th: 'ณัฐพงศ์' }, { en: 'Siriporn', th: 'ศิริพร' },
+        { en: 'Kamon', th: 'กมล' }, { en: 'Busaba', th: 'บุษบา' },
+        { en: 'Jirawat', th: 'จิรวัฒน์' }, { en: 'Orathai', th: 'อรทัย' },
+        { en: 'Kittisak', th: 'กิตติศักดิ์' }, { en: 'Daranee', th: 'ดารณี' },
+        { en: 'Phuwadol', th: 'ภูวดล' }, { en: 'Ratchanee', th: 'รัชนี' }
+    ];
+    const lastNames = [
+        { en: 'Jaidee', th: 'ใจดี' }, { en: 'Rakdee', th: 'รักดี' },
+        { en: 'Sooksan', th: 'สุขสันต์' }, { en: 'Maneewong', th: 'มณีวงศ์' },
+        { en: 'Kugimiya', th: 'คูกิมิยะ' }, { en: 'Sperbund', th: 'เสปอร์บันด์' },
+        { en: 'Thongchai', th: 'ทองชัย' }, { en: 'Wongsa', th: 'วงศา' },
+        { en: 'Srisuk', th: 'ศรีสุข' }, { en: 'Phromphan', th: 'พรหมพันธุ์' },
+        { en: 'Chaiyawat', th: 'ชัยวัฒน์' }, { en: 'Intarakorn', th: 'อินทรากร' },
+        { en: 'Boonsiri', th: 'บุญศิริ' }, { en: 'Lertchai', th: 'เลิศชัย' },
+        { en: 'Sawangdee', th: 'สว่างดี' }, { en: 'Thanasuk', th: 'ธนสุข' },
+        { en: 'Kanchanapong', th: 'กาญจนพงศ์' }, { en: 'Ruangrit', th: 'เรืองฤทธิ์' },
+        { en: 'Chantarasiri', th: 'จันทรศิริ' }, { en: 'Wattanakul', th: 'วัฒนกุล' }
+    ];
 
-    const randomFName = nameData.firstNames[getRandomInt(0, nameData.firstNames.length - 1)];
-    const randomLName = nameData.lastNames[getRandomInt(0, nameData.lastNames.length - 1)];
+    const randomFName = firstNames[getRandomInt(0, firstNames.length - 1)];
+    const randomLName = lastNames[getRandomInt(0, lastNames.length - 1)];
 
     let cardNumber = '';
     for (let i = 0; i < 16; i++) cardNumber += getRandomInt(0, 9);
@@ -209,4 +230,4 @@ function displayRandomData() {
 }
 
 // Initial call to load data
-document.addEventListener('DOMContentLoaded', loadAllData);
+document.addEventListener('DOMContentLoaded', loadAddressData);
