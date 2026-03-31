@@ -74,3 +74,43 @@ export function createAddress() {
         zipcode: subDistrict.zip_code
     };
 }
+
+export function createEmail() {
+    if (!appData.isLoaded || appData.firstNames.length === 0 || appData.lastNames.length === 0) return null;
+    const randomFName = appData.firstNames[getRandomInt(0, appData.firstNames.length - 1)].en.toLowerCase();
+    const randomLName = appData.lastNames[getRandomInt(0, appData.lastNames.length - 1)].en.toLowerCase();
+    const domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'example.com'];
+    const domain = domains[getRandomInt(0, domains.length - 1)];
+    const email = `${randomFName}.${randomLName.charAt(0)}${getRandomInt(1, 99)}@${domain}`;
+
+    return {
+        type: 'email',
+        email: email
+    };
+}
+
+export function createCompany() {
+    if (!appData.isLoaded || !appData.companyNames.name_parts_1) return null;
+    const part1 = appData.companyNames.name_parts_1[getRandomInt(0, appData.companyNames.name_parts_1.length - 1)];
+    const part2 = appData.companyNames.name_parts_2[getRandomInt(0, appData.companyNames.name_parts_2.length - 1)];
+    const domain = appData.companyNames.domains[getRandomInt(0, appData.companyNames.domains.length - 1)];
+
+    const companyName = `${part1} ${part2}`;
+    const website = `${part1.toLowerCase().replace(/ /g, '-')}.${domain}`;
+
+    return {
+        type: 'company',
+        name: companyName,
+        website: website
+    };
+}
+
+export function createUuid() {
+    return {
+        type: 'uuid',
+        uuid: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        })
+    };
+}

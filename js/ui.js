@@ -6,7 +6,10 @@ const dataGenerators = [
     generators.createThaiId,
     generators.createCreditCard,
     generators.createPhoneNumber,
-    generators.createAddress
+    generators.createAddress,
+    generators.createEmail,
+    generators.createCompany,
+    generators.createUuid
 ];
 
 /**
@@ -23,7 +26,7 @@ export function displayRandomData() {
 
     let generatedData = dataGenerators.map(generator => generator()).filter(item => item !== null);
 
-    const displayOrder = ['thai_id', 'credit_card', 'phone_number', 'address'];
+    const displayOrder = ['thai_id', 'credit_card', 'phone_number', 'address', 'email', 'company', 'uuid'];
     generatedData.sort((a, b) => displayOrder.indexOf(a.type) - displayOrder.indexOf(b.type));
 
     displayElement.innerHTML = ''; // Clear old data
@@ -60,6 +63,19 @@ export function displayRandomData() {
                 <p class="mb-1"><strong>อำเภอ/เขต:</strong> ${item.district}</p>
                 <p class="mb-1"><strong>จังหวัด:</strong> ${item.province}</p>
                 <p class="mb-0"><strong>รหัสไปรษณีย์:</strong> ${item.zipcode}</p>`;
+        } else if (item.type === 'email') {
+            title = '<i class="bi bi-envelope-at-fill me-2"></i>อีเมล';
+            content = `<h5 class="text-center text-info-emphasis my-2 font-monospace">${item.email}</h5>`;
+        } else if (item.type === 'company') {
+            title = '<i class="bi bi-building-fill me-2"></i>บริษัท';
+            content = `
+                <div class="text-center">
+                    <h5 class="mb-2">${item.name}</h5>
+                    <p class="mb-0 text-muted small"><i class="bi bi-globe me-1"></i>${item.website}</p>
+                </div>`;
+        } else if (item.type === 'uuid') {
+            title = '<i class="bi bi-hash me-2"></i>UUID';
+            content = `<p class="text-center text-secondary my-2 font-monospace small">${item.uuid}</p>`;
         }
 
         if (title) {

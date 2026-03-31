@@ -7,6 +7,7 @@ export const appData = {
     subDistricts: [],
     firstNames: [],
     lastNames: [],
+    companyNames: {},
     isLoaded: false
 };
 
@@ -16,12 +17,13 @@ export const appData = {
  */
 export async function loadAllData(onDataLoadedCallback) {
     try {
-        const [provincesRes, districtsRes, subDistrictsRes, firstNamesRes, lastNamesRes] = await Promise.all([
+        const [provincesRes, districtsRes, subDistrictsRes, firstNamesRes, lastNamesRes, companyNamesRes] = await Promise.all([
             fetch('src/province.json'),
             fetch('src/district.json'),
             fetch('src/sub_district.json'),
             fetch('src/first_names.json'),
-            fetch('src/last_names.json')
+            fetch('src/last_names.json'),
+            fetch('src/company_names.json')
         ]);
 
         appData.provinces = await provincesRes.json();
@@ -29,6 +31,7 @@ export async function loadAllData(onDataLoadedCallback) {
         appData.subDistricts = await subDistrictsRes.json();
         appData.firstNames = await firstNamesRes.json();
         appData.lastNames = await lastNamesRes.json();
+        appData.companyNames = await companyNamesRes.json();
 
         appData.isLoaded = true;
         console.log("All data loaded successfully.");
