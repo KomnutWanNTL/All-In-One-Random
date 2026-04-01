@@ -10,7 +10,20 @@ function getRandomInt(min, max) {
 
 export function createThaiId() {
     let id = '';
-    for (let i = 0; i < 13; i++) id += getRandomInt(0, 9);
+    // Generate first 12 digits randomly
+    for (let i = 0; i < 12; i++) {
+        id += getRandomInt(0, 9);
+    }
+
+    // Calculate checksum digit
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+        sum += parseInt(id.charAt(i), 10) * (13 - i);
+    }
+
+    const checksum = (11 - (sum % 11)) % 10;
+    id += checksum;
+
     const formattedId = `${id.substring(0, 1)}-${id.substring(1, 5)}-${id.substring(5, 10)}-${id.substring(10, 12)}-${id.substring(12, 13)}`;
     return {
         type: 'thai_id',
