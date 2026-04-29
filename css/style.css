@@ -1,101 +1,402 @@
-/* Fix text color for Bootstrap utility classes in dark mode */
-@media (prefers-color-scheme: dark) {
+/* ============================================================
+   Design Tokens
+   ============================================================ */
+:root {
+    --font-body: 'IBM Plex Sans Thai', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
-    .text-muted,
-    .small,
-    .text-secondary,
-    .text-info-emphasis,
-    .font-monospace,
-    .text-success {
-        color: #bfc8d0 !important;
-    }
-
-    .text-primary {
-        color: #7abaff !important;
-    }
-
-    .text-success {
-        color: #7be495 !important;
-    }
-
-    .text-info-emphasis {
-        color: #6ecbff !important;
-    }
+    /* Light theme */
+    --bg-page: #f4f6fb;
+    --bg-header: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+    --bg-card: #ffffff;
+    --bg-card-header: #f8faff;
+    --border-card: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-label: #94a3b8;
+    --text-value: #0f172a;
+    --accent-blue: #2563eb;
+    --accent-blue-soft: #eff6ff;
+    --shadow-card: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.07);
+    --shadow-card-hover: 0 4px 8px rgba(0,0,0,.08), 0 12px 32px rgba(0,0,0,.1);
+    --radius-card: 16px;
+    --radius-btn: 10px;
+    --transition: 0.2s ease;
 }
 
-.dark-mode .text-muted,
-.dark-mode .small,
-.dark-mode .text-secondary,
-.dark-mode .text-info-emphasis,
-.dark-mode .font-monospace,
-.dark-mode .text-success {
-    color: #bfc8d0 !important;
+[data-theme="dark"] {
+    --bg-page: #0f1117;
+    --bg-header: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
+    --bg-card: #1a1d27;
+    --bg-card-header: #1e2130;
+    --border-card: #2a2f3d;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-label: #64748b;
+    --text-value: #f1f5f9;
+    --accent-blue: #3b82f6;
+    --accent-blue-soft: #1e3a8a22;
+    --shadow-card: 0 1px 3px rgba(0,0,0,.3), 0 4px 20px rgba(0,0,0,.4);
+    --shadow-card-hover: 0 4px 8px rgba(0,0,0,.4), 0 16px 40px rgba(0,0,0,.5);
 }
 
-.dark-mode .text-primary {
-    color: #7abaff !important;
+/* ============================================================
+   Reset / Base
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background var(--transition), color var(--transition);
 }
 
-.dark-mode .text-success {
-    color: #7be495 !important;
+/* ============================================================
+   Header
+   ============================================================ */
+.app-header {
+    background: var(--bg-header);
+    color: #fff;
+    padding: 0 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,.2);
 }
 
-.dark-mode .text-info-emphasis {
-    color: #6ecbff !important;
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
-/* --- Dark/Light Mode Support --- */
-body,
-.card,
-.card-header,
+.brand {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.brand-icon {
+    width: 42px; height: 42px;
+    background: rgba(255,255,255,.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    backdrop-filter: blur(6px);
+    flex-shrink: 0;
+}
+
+.brand-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+    line-height: 1.2;
+}
+
+.brand-subtitle {
+    font-size: .72rem;
+    opacity: .75;
+    font-weight: 400;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+/* Generate button */
+.btn-generate {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .5rem 1.1rem;
+    background: rgba(255,255,255,.18);
+    border: 1.5px solid rgba(255,255,255,.35);
+    border-radius: var(--radius-btn);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+    white-space: nowrap;
+}
+
+.btn-generate:hover {
+    background: rgba(255,255,255,.28);
+    box-shadow: 0 4px 16px rgba(0,0,0,.2);
+}
+
+.btn-generate:active {
+    transform: scale(.97);
+}
+
+.btn-generate .bi-arrow-repeat {
+    font-size: 1rem;
+    transition: transform .4s ease;
+}
+
+.btn-generate:active .bi-arrow-repeat {
+    transform: rotate(360deg);
+}
+
+/* Icon button */
+.btn-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,.3);
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+    transition: background var(--transition);
+}
+
+.btn-icon:hover {
+    background: rgba(255,255,255,.22);
+}
+
+/* ============================================================
+   Main
+   ============================================================ */
+.app-main {
+    flex: 1;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* ============================================================
+   Cards Grid
+   ============================================================ */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+/* ============================================================
+   Data Card
+   ============================================================ */
+.data-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+    animation: card-in .25s ease both;
+}
+
+.data-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+    border-color: var(--accent-blue);
+}
+
+@keyframes card-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger delay */
+.data-card:nth-child(1) { animation-delay: .03s; }
+.data-card:nth-child(2) { animation-delay: .06s; }
+.data-card:nth-child(3) { animation-delay: .09s; }
+.data-card:nth-child(4) { animation-delay: .12s; }
+.data-card:nth-child(5) { animation-delay: .15s; }
+.data-card:nth-child(6) { animation-delay: .18s; }
+.data-card:nth-child(7) { animation-delay: .21s; }
+
+/* Card header */
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .75rem 1rem;
+    background: var(--bg-card-header);
+    border-bottom: 1px solid var(--border-card);
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.card-type-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem;
+    flex-shrink: 0;
+}
+
+/* Per-type icon colors */
+.icon-id      { background: #eff6ff; color: #2563eb; }
+.icon-card    { background: #fdf4ff; color: #9333ea; }
+.icon-phone   { background: #f0fdf4; color: #16a34a; }
+.icon-address { background: #fff7ed; color: #ea580c; }
+.icon-email   { background: #ecfdf5; color: #059669; }
+.icon-company { background: #fefce8; color: #ca8a04; }
+.icon-uuid    { background: #f0f9ff; color: #0284c7; }
+
+[data-theme="dark"] .icon-id      { background: #1e3a8a33; color: #60a5fa; }
+[data-theme="dark"] .icon-card    { background: #7e22ce22; color: #c084fc; }
+[data-theme="dark"] .icon-phone   { background: #14532d33; color: #4ade80; }
+[data-theme="dark"] .icon-address { background: #7c2d1222; color: #fb923c; }
+[data-theme="dark"] .icon-email   { background: #06402833; color: #34d399; }
+[data-theme="dark"] .icon-company { background: #71350433; color: #fbbf24; }
+[data-theme="dark"] .icon-uuid    { background: #0c4a6e33; color: #38bdf8; }
+
+/* Copy button */
+.btn-copy {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border-card);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: .85rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    flex-shrink: 0;
+}
+
+.btn-copy:hover {
+    background: var(--accent-blue-soft);
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+/* Card body */
 .card-body {
-    transition: background 0.3s, color 0.3s;
+    padding: 1rem 1.1rem 1.1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
 }
 
-/* System dark mode (default) */
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #181a1b !important;
-        color: #e6e6e6;
-    }
-
-    .card {
-        background: #23272b;
-        color: #e6e6e6;
-        box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.32), 0 1.5px 6px 0 rgba(0, 0, 0, 0.18);
-    }
-
-    .card-header {
-        background: #23272b !important;
-        color: #f8f9fa;
-    }
-
-    .btn-primary {
-        background: #2563eb;
-        border-color: #2563eb;
-    }
+/* Generic field row */
+.field-row {
+    display: flex;
+    flex-direction: column;
+    gap: .18rem;
 }
 
-/* Manual dark mode override */
-.dark-mode body {
-    background-color: #181a1b !important;
-    color: #e6e6e6;
+.field-label {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text-label);
 }
 
-.dark-mode .card {
-    background: #23272b;
-    color: #e6e6e6;
-    box-shadow: 0 2px 16px 0 rgba(0, 0, 0, 0.32), 0 1.5px 6px 0 rgba(0, 0, 0, 0.18);
+.field-value {
+    font-size: .925rem;
+    color: var(--text-value);
+    word-break: break-all;
 }
 
-.dark-mode .card-header {
-    background: #23272b !important;
-    color: #f8f9fa;
+.field-value.mono {
+    font-family: var(--font-mono);
 }
 
-.dark-mode .btn-primary {
-    background: #2563eb;
-    border-color: #2563eb;
+.field-value.large {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    font-family: var(--font-mono);
+}
+
+.field-value.highlight {
+    color: var(--accent-blue);
+}
+
+/* Horizontal divider inside card */
+.card-divider {
+    height: 1px;
+    background: var(--border-card);
+    margin: .15rem 0;
+}
+
+/* Inline two-col layout */
+.field-row-inline {
+    display: flex;
+    gap: 1rem;
+}
+
+.field-row-inline .field-row { flex: 1; }
+
+/* ============================================================
+   Loading State
+   ============================================================ */
+.loading-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border-card);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.app-footer {
+    text-align: center;
+    padding: 1.25rem 1rem;
+    font-size: .75rem;
+    color: var(--text-label);
+    border-top: 1px solid var(--border-card);
+    background: var(--bg-card);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 480px) {
+    .brand-title { font-size: .95rem; }
+    .brand-subtitle { display: none; }
+    .app-main { padding: 1.25rem 1rem; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .btn-generate span { display: none; }
+    .btn-generate { padding: .5rem .7rem; }
 }
 
 .dark-mode .btn {

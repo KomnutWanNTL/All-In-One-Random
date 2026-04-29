@@ -12,114 +12,198 @@ const dataGenerators = [
     generators.createUuid
 ];
 
-/**
- * Generates and displays random data in the UI.
- */
+const displayOrder = ['thai_id', 'credit_card', 'phone_number', 'address', 'email', 'company', 'uuid'];
+
+function buildCard(item, idx) {
+    let titleText = '', iconClass = '', iconType = '', copyValue = '', bodyHTML = '';
+
+    if (item.type === 'thai_id') {
+        titleText = 'บัตรประชาชน';
+        iconClass = 'bi-person-vcard-fill';
+        iconType = 'icon-id';
+        copyValue = item.formatted;
+        bodyHTML = `
+            <div class="field-row">
+                <span class="field-label">รหัสบัตร</span>
+                <span class="field-value large highlight">${item.formatted}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">ไม่มีขีด</span>
+                <span class="field-value mono">${item.unformatted}</span>
+            </div>`;
+
+    } else if (item.type === 'credit_card') {
+        titleText = 'บัตรเครดิต';
+        iconClass = 'bi-credit-card-2-front-fill';
+        iconType = 'icon-card';
+        const formattedNum = item.cardNumber.match(/.{1,4}/g).join(' ');
+        copyValue = formattedNum;
+        bodyHTML = `
+            <div class="field-row">
+                <span class="field-label">Card Number</span>
+                <span class="field-value large">${formattedNum}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Card Holder</span>
+                <span class="field-value">${item.firstName.toUpperCase()} ${item.lastName.toUpperCase()}</span>
+                <span class="field-value" style="font-size:.78rem;color:var(--text-secondary)">${item.firstNameTh} ${item.lastNameTh}</span>
+            </div>
+            <div class="card-divider"></div>
+            <div class="field-row-inline">
+                <div class="field-row">
+                    <span class="field-label">Expiry</span>
+                    <span class="field-value mono">${item.expiryDate}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">CVV</span>
+                    <span class="field-value mono">${item.cvv}</span>
+                </div>
+            </div>`;
+
+    } else if (item.type === 'phone_number') {
+        titleText = 'เบอร์โทรศัพท์';
+        iconClass = 'bi-phone-fill';
+        iconType = 'icon-phone';
+        copyValue = item.formatted;
+        bodyHTML = `
+            <div class="field-row">
+                <span class="field-label">หมายเลข</span>
+                <span class="field-value large highlight">${item.formatted}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">ไม่มีขีด</span>
+                <span class="field-value mono">${item.unformatted}</span>
+            </div>`;
+
+    } else if (item.type === 'address') {
+        titleText = 'ที่อยู่';
+        iconClass = 'bi-geo-alt-fill';
+        iconType = 'icon-address';
+        copyValue = `${item.houseNumber} ${item.moo}, ต.${item.subDistrict}, อ.${item.district}, จ.${item.province} ${item.zipcode}`;
+        bodyHTML = `
+            <div class="field-row">
+                <span class="field-label">บ้านเลขที่</span>
+                <span class="field-value">${item.houseNumber} ${item.moo}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">ตำบล / แขวง</span>
+                <span class="field-value">${item.subDistrict}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">อำเภอ / เขต</span>
+                <span class="field-value">${item.district}</span>
+            </div>
+            <div class="field-row-inline">
+                <div class="field-row">
+                    <span class="field-label">จังหวัด</span>
+                    <span class="field-value">${item.province}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">รหัสไปรษณีย์</span>
+                    <span class="field-value mono">${item.zipcode}</span>
+                </div>
+            </div>`;
+
+    } else if (item.type === 'email') {
+        titleText = 'อีเมล';
+        iconClass = 'bi-envelope-at-fill';
+        iconType = 'icon-email';
+        copyValue = item.email;
+        bodyHTML = `
+            <div class="field-row">
+                <span class="field-label">Email Address</span>
+                <span class="field-value mono highlight" style="font-size:1rem;word-break:break-all">${item.email}</span>
+            </div>`;
+
+    } else if (item.type === 'company') {
+        titleText = 'บริษัท';
+        iconClass = 'bi-building-fill';
+        iconType = 'icon-company';
+        copyValue = item.name;
+        bodyHTML = `
+            <div class="field-row">
+                <span class="field-label">ชื่อบริษัท</span>
+                <span class="field-value" style="font-size:1.05rem;font-weight:600">${item.name}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">เว็บไซต์</span>
+                <span class="field-value mono" style="font-size:.85rem">${item.website}</span>
+            </div>`;
+
+    } else if (item.type === 'uuid') {
+        titleText = 'UUID';
+        iconClass = 'bi-hash';
+        iconType = 'icon-uuid';
+        copyValue = item.uuid;
+        bodyHTML = `
+            <div class="field-row">
+                <span class="field-label">UUID v4</span>
+                <span class="field-value mono" style="font-size:.82rem;line-height:1.6;word-break:break-all">${item.uuid}</span>
+            </div>`;
+    }
+
+    if (!titleText) return null;
+
+    const copyBtnId = `copy-btn-${idx}`;
+    const el = document.createElement('div');
+    el.className = 'data-card';
+    el.innerHTML = `
+        <div class="card-head">
+            <div class="card-title">
+                <span class="card-type-icon ${iconType}"><i class="bi ${iconClass}"></i></span>
+                ${titleText}
+            </div>
+            <button type="button" class="btn-copy" id="${copyBtnId}" title="คัดลอก" aria-label="Copy">
+                <i class="bi bi-clipboard"></i>
+            </button>
+        </div>
+        <div class="card-body">${bodyHTML}</div>`;
+
+    return { el, copyValue, copyBtnId };
+}
+
+function attachCopy({ el, copyValue, copyBtnId }) {
+    const btn = el.querySelector(`#${copyBtnId}`);
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(copyValue);
+            btn.innerHTML = '<i class="bi bi-clipboard-check" style="color:#16a34a"></i>';
+        } catch {
+            btn.innerHTML = '<i class="bi bi-x-circle" style="color:#dc2626"></i>';
+        }
+        setTimeout(() => { btn.innerHTML = '<i class="bi bi-clipboard"></i>'; }, 1400);
+    });
+}
+
 export function displayRandomData() {
     const displayElement = document.getElementById('display-data');
     if (!displayElement) return;
 
     if (!appData.isLoaded) {
-        displayElement.innerHTML = `<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">กำลังโหลดข้อมูล...</p></div>`;
+        displayElement.innerHTML = `
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <span>กำลังโหลดข้อมูล...</span>
+            </div>`;
         return;
     }
 
-    let generatedData = dataGenerators.map(generator => generator()).filter(item => item !== null);
-
-    const displayOrder = ['thai_id', 'credit_card', 'phone_number', 'address', 'email', 'company', 'uuid'];
+    let generatedData = dataGenerators.map(g => g()).filter(Boolean);
     generatedData.sort((a, b) => displayOrder.indexOf(a.type) - displayOrder.indexOf(b.type));
 
     displayElement.innerHTML = '';
     const fragment = document.createDocumentFragment();
+    const cards = [];
 
     generatedData.forEach((item, idx) => {
-        let title = '', content = '', copyValue = '';
-
-        if (item.type === 'thai_id') {
-            title = '<i class="bi bi-person-vcard-fill me-2"></i>บัตรประชาชน';
-            content = `<h4 class="text-center text-primary my-2 font-monospace">${item.formatted}</h4><p class="mb-0 text-center text-muted small">(Unformatted: ${item.unformatted})</p>`;
-            copyValue = item.formatted;
-        } else if (item.type === 'credit_card') {
-            title = '<i class="bi bi-credit-card-2-front-fill me-2"></i>บัตรเครดิต';
-            const formattedCardNumber = item.cardNumber.match(/.{1,4}/g).join(' ');
-            content = `
-                <div class="mb-3">
-                    <div class="small text-muted">Card Number</div>
-                    <div class="fs-5 font-monospace">${formattedCardNumber}</div>
-                </div>
-                <div class="small text-muted">Card Holder</div>
-                <div class="fs-6 mb-1">${item.firstName.toUpperCase()} ${item.lastName.toUpperCase()}</div>
-                <div class="small text-muted">(${item.firstNameTh} ${item.lastNameTh})</div>
-                <div class="d-flex justify-content-between mt-3 text-muted small border-top pt-3">
-                    <span><strong>EXP:</strong> ${item.expiryDate}</span>
-                    <span><strong>CVV:</strong> ${item.cvv}</span>
-                </div>`;
-            copyValue = formattedCardNumber;
-        } else if (item.type === 'phone_number') {
-            title = '<i class="bi bi-phone-fill me-2"></i>เบอร์โทรศัพท์';
-            content = `<h4 class="text-success text-center my-2 font-monospace">${item.formatted}</h4><p class="mb-0 text-center text-muted small">(Unformatted: ${item.unformatted})</p>`;
-            copyValue = item.formatted;
-        } else if (item.type === 'address') {
-            title = '<i class="bi bi-geo-alt-fill me-2"></i>ที่อยู่';
-            content = `
-                <p class="mb-1"><strong>บ้านเลขที่:</strong> ${item.houseNumber} ${item.moo}</p>
-                <p class="mb-1"><strong>ตำบล/แขวง:</strong> ${item.subDistrict}</p>
-                <p class="mb-1"><strong>อำเภอ/เขต:</strong> ${item.district}</p>
-                <p class="mb-1"><strong>จังหวัด:</strong> ${item.province}</p>
-                <p class="mb-0"><strong>รหัสไปรษณีย์:</strong> ${item.zipcode}</p>`;
-            copyValue = `${item.houseNumber} ${item.moo}, ${item.subDistrict}, ${item.district}, ${item.province} ${item.zipcode}`;
-        } else if (item.type === 'email') {
-            title = '<i class="bi bi-envelope-at-fill me-2"></i>อีเมล';
-            content = `<h5 class="text-center text-info-emphasis my-2 font-monospace">${item.email}</h5>`;
-            copyValue = item.email;
-        } else if (item.type === 'company') {
-            title = '<i class="bi bi-building-fill me-2"></i>บริษัท';
-            content = `
-                <div class="text-center">
-                    <h5 class="mb-2">${item.name}</h5>
-                    <p class="mb-0 text-muted small"><i class="bi bi-globe me-1"></i>${item.website}</p>
-                </div>`;
-            copyValue = item.name;
-        } else if (item.type === 'uuid') {
-            title = '<i class="bi bi-hash me-2"></i>UUID';
-            content = `<p class="text-center text-secondary my-2 font-monospace small">${item.uuid}</p>`;
-            copyValue = item.uuid;
-        }
-
-        if (title) {
-            const col = document.createElement('div');
-            col.className = 'col-md-6 col-lg-4';
-            // Add copy button (top-right in card-body)
-            const copyBtnId = `copy-btn-${idx}`;
-            col.innerHTML = `
-                <div class="card h-100 shadow-sm border-light-subtle">
-                    <div class="card-header bg-body-secondary bg-opacity-10 fw-bold">${title}</div>
-                    <div class="card-body d-flex flex-column justify-content-center position-relative">
-                        <button type="button" class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 copy-btn" id="${copyBtnId}" title="คัดลอก" aria-label="Copy">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
-                        ${content}
-                    </div>
-                </div>`;
-            fragment.appendChild(col);
-
-            // Add event after element is in DOM
-            setTimeout(() => {
-                const btn = document.getElementById(copyBtnId);
-                if (btn) {
-                    btn.addEventListener('click', async () => {
-                        try {
-                            await navigator.clipboard.writeText(copyValue);
-                            btn.innerHTML = '<i class="bi bi-clipboard-check text-success"></i>';
-                            setTimeout(() => { btn.innerHTML = '<i class="bi bi-clipboard"></i>'; }, 1200);
-                        } catch {
-                            btn.innerHTML = '<i class="bi bi-x-circle text-danger"></i>';
-                            setTimeout(() => { btn.innerHTML = '<i class="bi bi-clipboard"></i>'; }, 1200);
-                        }
-                    });
-                }
-            }, 0);
+        const result = buildCard(item, idx);
+        if (result) {
+            fragment.appendChild(result.el);
+            cards.push(result);
         }
     });
+
     displayElement.appendChild(fragment);
+    cards.forEach(attachCopy);
 }
