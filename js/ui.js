@@ -14,7 +14,7 @@ const dataGenerators = [
 
 const displayOrder = ['thai_id', 'credit_card', 'phone_number', 'address', 'email', 'company', 'uuid'];
 
-function buildCard(item, idx) {
+function buildCard(item, idx, generator) {
     let titleText = '', iconClass = '', iconType = '', copyValue = '', bodyHTML = '';
 
     if (item.type === 'thai_id') {
@@ -145,6 +145,7 @@ function buildCard(item, idx) {
     if (!titleText) return null;
 
     const copyBtnId = `copy-btn-${idx}`;
+    const refreshBtnId = `refresh-btn-${idx}`;
     const el = document.createElement('div');
     el.className = 'data-card';
     el.innerHTML = `
@@ -153,13 +154,18 @@ function buildCard(item, idx) {
                 <span class="card-type-icon ${iconType}"><i class="bi ${iconClass}"></i></span>
                 ${titleText}
             </div>
-            <button type="button" class="btn-copy" id="${copyBtnId}" title="คัดลอก" aria-label="Copy">
-                <i class="bi bi-clipboard"></i>
-            </button>
+            <div class="card-head-actions">
+                <button type="button" class="btn-icon-card" id="${refreshBtnId}" title="สุ่มใหม่" aria-label="Refresh">
+                    <i class="bi bi-arrow-repeat"></i>
+                </button>
+                <button type="button" class="btn-copy" id="${copyBtnId}" title="คัดลอก" aria-label="Copy">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+            </div>
         </div>
         <div class="card-body">${bodyHTML}</div>`;
 
-    return { el, copyValue, copyBtnId };
+    return { el, copyValue, copyBtnId, refreshBtnId, generator };
 }
 
 function attachCopy({ el, copyValue, copyBtnId }) {
@@ -173,6 +179,27 @@ function attachCopy({ el, copyValue, copyBtnId }) {
             btn.innerHTML = '<i class="bi bi-x-circle" style="color:#dc2626"></i>';
         }
         setTimeout(() => { btn.innerHTML = '<i class="bi bi-clipboard"></i>'; }, 1400);
+    });
+}
+
+function attachRefresh(result, idx) {
+    const btn = result.el.querySelector(`#${result.refreshBtnId}`);
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        const newItem = result.generator();
+        if (!newItem) return;
+        const newResult = buildCard(newItem, idx, result.generator);
+        if (!newResult) return;
+        result.el.replaceWith(newResult.el);
+        attachCopy(newResult);
+        attachRefresh(newResult, idx);
+        // spin animation
+        const icon = newResult.el.querySelector(`#${newResult.refreshBtnId} i`);
+        if (icon) {
+            icon.style.transition = 'transform .4s ease';
+            icon.style.transform = 'rotate(360deg)';
+            setTimeout(() => { icon.style.transform = ''; }, 420);
+        }
     });
 }
 
@@ -197,13 +224,17 @@ export function displayRandomData() {
     const cards = [];
 
     generatedData.forEach((item, idx) => {
-        const result = buildCard(item, idx);
+        const generator = dataGenerators[displayOrder.indexOf(item.type)];
+        const result = buildCard(item, idx, generator);
         if (result) {
             fragment.appendChild(result.el);
-            cards.push(result);
+            cards.push({ result, idx });
         }
     });
 
     displayElement.appendChild(fragment);
-    cards.forEach(attachCopy);
+    cards.forEach(({ result, idx }) => {
+        attachCopy(result);
+        attachRefresh(result, idx);
+    });
 }

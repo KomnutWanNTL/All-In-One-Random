@@ -272,6 +272,35 @@ body {
 [data-theme="dark"] .icon-uuid    { background: #0c4a6e33; color: #38bdf8; }
 
 /* Copy button */
+.card-head-actions {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.btn-icon-card {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border-card);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: .85rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--transition), color var(--transition), border-color var(--transition), transform .4s ease;
+    flex-shrink: 0;
+}
+
+.btn-icon-card:hover {
+    background: var(--accent-blue-soft);
+    color: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+.btn-icon-card:active i {
+    transform: rotate(360deg);
+}
+
 .btn-copy {
     width: 30px; height: 30px;
     border-radius: 8px;
