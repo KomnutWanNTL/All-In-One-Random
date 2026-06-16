@@ -185,7 +185,7 @@ function attachCopy({ el, copyValue, copyBtnId }) {
 function attachRefresh(result, idx) {
     const btn = result.el.querySelector(`#${result.refreshBtnId}`);
     if (!btn) return;
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
         const newItem = result.generator();
         if (!newItem) return;
         const newResult = buildCard(newItem, idx, result.generator);
@@ -199,6 +199,17 @@ function attachRefresh(result, idx) {
             icon.style.transition = 'transform .4s ease';
             icon.style.transform = 'rotate(360deg)';
             setTimeout(() => { icon.style.transform = ''; }, 420);
+        }
+        // auto copy new data to clipboard
+        try {
+            await navigator.clipboard.writeText(newResult.copyValue);
+            const copyBtn = newResult.el.querySelector(`#${newResult.copyBtnId}`);
+            if (copyBtn) {
+                copyBtn.innerHTML = '<i class="bi bi-clipboard-check" style="color:#16a34a"></i>';
+                setTimeout(() => { copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>'; }, 1400);
+            }
+        } catch {
+            // silently ignore if clipboard write fails
         }
     });
 }
